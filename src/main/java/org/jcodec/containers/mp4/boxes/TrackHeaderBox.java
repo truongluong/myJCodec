@@ -5,6 +5,8 @@ import static org.jcodec.containers.mp4.TimeUtil.toMovTime;
 
 import java.nio.ByteBuffer;
 
+import org.jcodec.common.tools.ToJSON;
+
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
  * under FreeBSD License
@@ -145,47 +147,39 @@ public class TrackHeaderBox extends FullBox {
         out.putShort((short) (volume * 256.));
     }
 
-    public int getTrackId() {
-        return trackId;
-    }
-
-    public long getCreated() {
-        return created;
-    }
-
-    public long getModified() {
-        return modified;
-    }
-
-    public float getVolume() {
-        return volume;
-    }
-
-    public short getLayer() {
-        return layer;
-    }
-
-    public long getAltGroup() {
-        return altGroup;
-    }
-
-    public int[] getMatrix() {
-        return matrix;
-    }
-
-    public void setWidth(float width) {
-        this.width = width;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
     public void setDuration(long duration) {
         this.duration = duration;
     }
 
     public void setNo(int no) {
         this.trackId = no;
+    }
+
+    public int[] getMatrix() {
+        return matrix;
+    }
+
+    public short getLayer() {
+        return layer;
+    }
+
+    public float getVolume() {
+        return volume;
+    }
+
+    public void setWidth(float width2) {
+        this.width = width2;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    @Override
+    protected void dump(StringBuilder sb) {
+        super.dump(sb);
+        sb.append(": ");
+        ToJSON.toJSON(this, sb, "trackId", "duration", "width", "height", "created", "modified", "volume", "layer",
+                "altGroup");
     }
 }

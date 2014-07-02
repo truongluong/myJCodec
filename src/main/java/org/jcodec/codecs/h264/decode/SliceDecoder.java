@@ -58,7 +58,6 @@ import org.jcodec.codecs.h264.io.model.SliceHeader;
 import org.jcodec.codecs.h264.io.model.SliceType;
 import org.jcodec.common.IntObjectMap;
 import org.jcodec.common.io.BitReader;
-import org.jcodec.common.logging.Logger;
 import org.jcodec.common.model.ColorSpace;
 import org.jcodec.common.model.Picture;
 import org.jcodec.common.tools.MathUtil;
@@ -474,7 +473,7 @@ public class SliceDecoder {
             decodeMBlockIntra16x16(reader, mbType, mbIdx, prevMbType, mb);
             mbt = MBType.I_16x16;
         } else {
-            Logger.warn("IPCM macroblock found. Not tested, may cause unpredictable behavior.");
+            System.out.println("IPCM!!!");
             decodeMBlockIPCM(reader, mbIdx, mb);
             mbt = MBType.I_PCM;
         }
@@ -2219,7 +2218,7 @@ public class SliceDecoder {
         for (int i = 0; i < frames.length; i++)
             if (frames[i] == refL0)
                 return i;
-        Logger.error("RefPicList0 shall contain refPicCol");
+        System.out.println("ERROR: RefPicList0 shall contain refPicCol");
         return 0;
     }
 
@@ -2407,7 +2406,7 @@ public class SliceDecoder {
 
     private void debugPrint(String str) {
         if (debug)
-            Logger.debug(str);
+            System.out.println(str);
     }
 
     public void setDebug(boolean debug) {

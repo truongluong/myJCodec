@@ -2,6 +2,7 @@ package org.jcodec.movtool.streaming.tracks;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 
 import org.jcodec.codecs.wav.WavHeader;
 import org.jcodec.common.NIOUtils;
@@ -49,8 +50,8 @@ public class WavTrack implements VirtualTrack {
         SeekableByteChannel ch = null;
         try {
             ch = pool.getChannel();
-            header = WavHeader.read(ch);
-            size = header.dataSize <= 0 ? ch.size() : header.dataSize;
+            header = WavHeader.read(Channels.newInputStream(ch));
+            size = ch.size();
         } finally {
             ch.close();
         }
@@ -58,14 +59,7 @@ public class WavTrack implements VirtualTrack {
         se = MP4Muxer.audioSampleEntry("sowt", 1, header.fmt.bitsPerSample >> 3, header.fmt.numChannels,
                 header.fmt.sampleRate, Endian.LITTLE_ENDIAN);
         ChannelBox chan = new ChannelBox();
-        if (labels != null && labels.length > 0) {
-            ChannelUtils.setLabels(labels, chan);
-        } else {
-            labels = new Label[header.getFormat().getChannels()];
-            for (int i = 0; i < labels.length; i++)
-                labels[i] = Label.Mono;
-            ChannelUtils.setLabels(labels, chan);
-        }
+        ChannelUtils.setLabels(labels, chan);
         se.add(chan);
 
         pktDataLen = FRAMES_PER_PKT * header.fmt.numChannels * (header.fmt.bitsPerSample >> 3);

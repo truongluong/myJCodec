@@ -39,16 +39,6 @@ public class LongArrayList {
         }
         storage[size++] = val;
     }
-    
-    public void push(long id) {
-        this.add(id);
-    }
-    
-    public void pop() {
-        if (size == 0)
-            return;
-        size--;
-    }
 
     public void set(int index, int value) {
         storage[index] = value;
@@ -82,14 +72,4 @@ public class LongArrayList {
         size += other.length;
     }
 
-    public void clear() {
-        size = 0;
-    }
-    
-    public boolean contains(long needle) {
-        for (int i = 0; i < size; i++)
-            if (storage[i] == needle)
-                return true;
-        return false;
-    }
 }

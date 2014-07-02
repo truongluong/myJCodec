@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class is part of JCodec ( www.jcodec.org ) This software is distributed
- * under FreeBSD License
+ * This class is part of JCodec ( www.jcodec.org )
+ * This software is distributed under FreeBSD License
  * 
  * Default box factory
  * 
@@ -15,7 +15,7 @@ import java.util.Map;
 public class BoxFactory {
     private Map<String, Class<? extends Box>> mappings = new HashMap<String, Class<? extends Box>>();
     private static BoxFactory instance = new BoxFactory();
-
+    
     public static BoxFactory getDefault() {
         return instance;
     }
@@ -38,7 +38,6 @@ public class BoxFactory {
         mappings.put(SampleDescriptionBox.fourcc(), SampleDescriptionBox.class);
         mappings.put(TimeToSampleBox.fourcc(), TimeToSampleBox.class);
         mappings.put(SyncSamplesBox.fourcc(), SyncSamplesBox.class);
-        mappings.put(PartialSyncSamplesBox.fourcc(), PartialSyncSamplesBox.class);
         mappings.put(SampleToChunkBox.fourcc(), SampleToChunkBox.class);
         mappings.put(SampleSizesBox.fourcc(), SampleSizesBox.class);
         mappings.put(ChunkOffsetsBox.fourcc(), ChunkOffsetsBox.class);
@@ -68,15 +67,8 @@ public class BoxFactory {
         mappings.put("udta", NodeBox.class);
         mappings.put(CompositionOffsetsBox.fourcc(), CompositionOffsetsBox.class);
         mappings.put(NameBox.fourcc(), NameBox.class);
-
-        mappings.put(MovieFragmentHeaderBox.fourcc(), MovieFragmentHeaderBox.class);
-        mappings.put(TrackFragmentHeaderBox.fourcc(), TrackFragmentHeaderBox.class);
-        mappings.put(MovieFragmentBox.fourcc(), MovieFragmentBox.class);
-        mappings.put(TrackFragmentBox.fourcc(), TrackFragmentBox.class);
-        mappings.put(TrackFragmentBaseMediaDecodeTimeBox.fourcc(), TrackFragmentBaseMediaDecodeTimeBox.class);
-        mappings.put(TrunBox.fourcc(), TrunBox.class);
     }
-
+    
     public void override(String fourcc, Class<? extends Box> cls) {
         mappings.put(fourcc, cls);
     }

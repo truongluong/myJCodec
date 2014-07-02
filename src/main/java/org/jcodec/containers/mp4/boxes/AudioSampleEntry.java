@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,15 +25,13 @@ import org.jcodec.containers.mp4.boxes.channel.Label;
  */
 public class AudioSampleEntry extends SampleEntry {
 
-//@formatter:off
-    public static int kAudioFormatFlagIsFloat           = 0x1;
-    public static int kAudioFormatFlagIsBigEndian       = 0x2;
-    public static int kAudioFormatFlagIsSignedInteger   = 0x4;
-    public static int kAudioFormatFlagIsPacked          = 0x8;
-    public static int kAudioFormatFlagIsAlignedHigh     = 0x10;
-    public static int kAudioFormatFlagIsNonInterleaved  = 0x20;
-    public static int kAudioFormatFlagIsNonMixable      = 0x40;
-//@formatter:on    
+    public static int kAudioFormatFlagIsFloat = (1 << 0); // 0x1
+    public static int kAudioFormatFlagIsBigEndian = (1 << 1); // 0x2
+    public static int kAudioFormatFlagIsSignedInteger = (1 << 2); // 0x4
+    public static int kAudioFormatFlagIsPacked = (1 << 3); // 0x8
+    public static int kAudioFormatFlagIsAlignedHigh = (1 << 4); // 0x10
+    public static int kAudioFormatFlagIsNonInterleaved = (1 << 5); // 0x20
+    public static int kAudioFormatFlagIsNonMixable = (1 << 6); // 0x40
 
     private static final MyFactory FACTORY = new MyFactory();
     private short channelCount;
@@ -133,12 +130,14 @@ public class AudioSampleEntry extends SampleEntry {
                 out.putInt(bytesPerPkt);
                 out.putInt(bytesPerFrame);
                 out.putInt(bytesPerSample);
+
+                writeExtensions(out);
             }
         } else if (version == 2) {
-            out.putShort((short) 3);
-            out.putShort((short) 16);
-            out.putShort((short) -2);
-            out.putShort((short) 0);
+            out.putShort((short)3);
+            out.putShort((short)16);
+            out.putShort((short)-2);
+            out.putShort((short)0);
             out.putInt(65536);
             out.putInt(72);
             out.putLong(Double.doubleToLongBits(sampleRate));
@@ -149,8 +148,8 @@ public class AudioSampleEntry extends SampleEntry {
             out.putInt(bytesPerFrame);
             out.putInt(samplesPerPkt);
 
+            writeExtensions(out);
         }
-        writeExtensions(out);
     }
 
     public short getChannelCount() {
@@ -239,8 +238,19 @@ public class AudioSampleEntry extends SampleEntry {
     }
 
     public AudioFormat getFormat() {
-        return new AudioFormat((int) sampleRate, calcSampleSize() << 3, channelCount, true,
-                getEndian() == Endian.BIG_ENDIAN);
+        return new AudioFormat((int)sampleRate, calcSampleSize() << 3, channelCount, true, getEndian() == Endian.BIG_ENDIAN);
+    }
+
+    @Override
+    public void dump(StringBuilder sb) {
+        sb.append(header.getFourcc() + ": {\n");
+        sb.append("entry: ");
+        ToJSON.toJSON(this, sb, "channelCount", "sampleSize", "sampleRat", "revision", "vendor", "compressionId",
+                "pktSize", "samplesPerPkt", "bytesPerPkt", "bytesPerFrame", "bytesPerSample", "version", "lpcmFlags");
+        sb.append(",\nexts: [\n");
+        dumpBoxes(sb);
+        sb.append("\n]\n");
+        sb.append("}\n");
     }
 
     public ChannelLabel[] getLabels() {
@@ -309,9 +319,5 @@ public class AudioSampleEntry extends SampleEntry {
         translationSurround.put(Label.RightTotal, ChannelLabel.STEREO_RIGHT);
         translationSurround.put(Label.LeftWide, ChannelLabel.STEREO_LEFT);
         translationSurround.put(Label.RightWide, ChannelLabel.STEREO_RIGHT);
-    }
-
-    protected void getModelFields(List<String> list) {
-        ToJSON.allFieldsExcept(this.getClass(), "endian", "float", "format", "labels");
     }
 }

@@ -39,16 +39,6 @@ public class IntArrayList {
         storage[size++] = val;
     }
 
-    public void push(int id) {
-        this.add(id);
-    }
-
-    public void pop() {
-        if (size == 0)
-            return;
-        size--;
-    }
-
     public void set(int index, int value) {
         storage[index] = value;
     }
@@ -79,16 +69,5 @@ public class IntArrayList {
         }
         System.arraycopy(other, 0, storage, size, other.length);
         size += other.length;
-    }
-
-    public void clear() {
-        size = 0;
-    }
-
-    public boolean contains(int needle) {
-        for (int i = 0; i < size; i++)
-            if (storage[i] == needle)
-                return true;
-        return false;
     }
 }

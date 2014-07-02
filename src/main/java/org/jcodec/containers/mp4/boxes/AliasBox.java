@@ -191,6 +191,17 @@ public class AliasBox extends FullBox {
         return alis;
     }
 
+    @Override
+    protected void dump(StringBuilder sb) {
+        super.dump(sb);
+        sb.append(": ");
+        if (isSelfRef())
+            sb.append("'self'");
+        else
+            sb.append("'" + getUnixPath() + "'");
+
+    }
+
     public String getUnixPath() {
         ExtraField extraField = getExtra(AliasBox.UNIXAbsolutePath);
         return extraField == null ? null : "/" + extraField.toString();

@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jcodec.common.logging.Logger;
-
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
  * under FreeBSD License
@@ -28,7 +26,7 @@ public class GenericTrack extends MXFInterchangeObject {
     protected void read(Map<Integer, ByteBuffer> tags) {
         for (Iterator<Entry<Integer, ByteBuffer>> it = tags.entrySet().iterator(); it.hasNext();) {
             Entry<Integer, ByteBuffer> entry = it.next();
-
+            
             ByteBuffer _bb = entry.getValue();
             switch (entry.getKey()) {
             case 0x4801:
@@ -44,7 +42,7 @@ public class GenericTrack extends MXFInterchangeObject {
                 trackNumber = _bb.getInt();
                 break;
             default:
-                Logger.warn(String.format("Unknown tag [ " + ul + "]: %04x", entry.getKey()));
+//                System.out.println(String.format("Unknown tag [ GenericTrack: " + ul + "]: %04x", entry.getKey()));
                 continue;
             }
             it.remove();

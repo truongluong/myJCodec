@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jcodec.common.NIOUtils;
+import org.jcodec.common.tools.ToJSON;
 
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
@@ -17,12 +18,10 @@ import org.jcodec.common.NIOUtils;
  */
 public class TimecodeSampleEntry extends SampleEntry {
 
-//@formatter:off
-    public static final int FLAG_DROPFRAME      = 0x1;
-    public static final int FLAG_24HOURMAX      = 0x2;
+    public static final int FLAG_DROPFRAME = 0x1;
+    public static final int FLAG_24HOURMAX = 0x2;
     public static final int FLAG_NEGATIVETIMEOK = 0x4;
-    public static final int FLAG_COUNTER        = 0x8;
-//@formatter:on
+    public static final int FLAG_COUNTER = 0x8;
 
     private static final MyFactory FACTORY = new MyFactory();
     private int flags;
@@ -98,5 +97,17 @@ public class TimecodeSampleEntry extends SampleEntry {
 
     public boolean isDropFrame() {
         return (flags & FLAG_DROPFRAME) != 0;
+    }
+
+    @Override
+    public void dump(StringBuilder sb) {
+        sb.append(header.getFourcc() + ": {\n");
+        sb.append("entry: ");
+
+        ToJSON.toJSON(this, sb, "flags", "timescale", "frameDuration", "numFrames");
+        sb.append(",\nexts: [\n");
+        dumpBoxes(sb);
+        sb.append("\n]\n");
+        sb.append("}\n");
     }
 }

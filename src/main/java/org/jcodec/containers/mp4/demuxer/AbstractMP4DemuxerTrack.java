@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import org.jcodec.common.SeekableDemuxerTrack;
 import org.jcodec.common.NIOUtils;
 import org.jcodec.common.SeekableByteChannel;
-import org.jcodec.common.SeekableDemuxerTrack;
 import org.jcodec.common.model.RationalLarge;
 import org.jcodec.containers.mp4.MP4Packet;
 import org.jcodec.containers.mp4.TrackType;
@@ -144,15 +144,22 @@ public abstract class AbstractMP4DemuxerTrack implements SeekableDemuxerTrack {
         return true;
     }
 
-    protected void shiftPts(long frames) {
-        pts -= sttsSubInd * timeToSamples[sttsInd].getSampleDuration();
-        sttsSubInd += frames;
-        while (sttsInd < timeToSamples.length - 1 && sttsSubInd >= timeToSamples[sttsInd].getSampleCount()) {
-            pts += timeToSamples[sttsInd].getSegmentDuration();
-            sttsSubInd -= timeToSamples[sttsInd].getSampleCount();
+    protected long shiftPts(long frames) {
+        long result = 0;
+        int rem;
+        while (frames > (rem = timeToSamples[sttsInd].getSampleCount() - sttsSubInd)) {
+            frames -= rem;
+            result += rem * timeToSamples[sttsInd].getSampleDuration();
             sttsInd++;
+            sttsSubInd = 0;
+            if (sttsInd >= timeToSamples.length)
+                return result;
         }
-        pts += sttsSubInd * timeToSamples[sttsInd].getSampleDuration();
+        result += frames * timeToSamples[sttsInd].getSampleDuration();
+
+        pts += result;
+
+        return result;
     }
 
     protected void nextChunk() {

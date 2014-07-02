@@ -13,32 +13,26 @@ import org.jcodec.common.NIOUtils;
  * 
  */
 public class IndexEntries {
-    private byte[] displayOff;
+    private byte[] tOff;
     private byte[] flags;
-    private long[] fileOff;
-    private byte[] keyFrameOff;
+    private long[] off;
 
-    public IndexEntries(byte[] displayOff, byte[] keyFrameOff, byte[] flags, long[] fileOff) {
-        this.displayOff = displayOff;
-        this.keyFrameOff = keyFrameOff;
+    public IndexEntries(byte[] tOff, byte[] flags, long[] off) {
+        this.tOff = tOff;
         this.flags = flags;
-        this.fileOff = fileOff;
+        this.off = off;
     }
 
-    public byte[] getDisplayOff() {
-        return displayOff;
+    public byte[] gettOff() {
+        return tOff;
     }
 
     public byte[] getFlags() {
         return flags;
     }
 
-    public long[] getFileOff() {
-        return fileOff;
-    }
-
-    public byte[] getKeyFrameOff() {
-        return keyFrameOff;
+    public long[] getOff() {
+        return off;
     }
 
     public static IndexEntries read(ByteBuffer bb) {
@@ -46,28 +40,18 @@ public class IndexEntries {
         int n = bb.getInt();
         int len = bb.getInt();
 
-        int[] temporalOff = new int[n];
+        byte[] tOff = new byte[n];
         byte[] flags = new byte[n];
-        long[] fileOff = new long[n];
-        byte[] keyFrameOff = new byte[n];
+        long[] off = new long[n];
 
         for (int i = 0; i < n; i++) {
-            temporalOff[i] = i + bb.get();
-            keyFrameOff[i] = bb.get();
+            tOff[i] = bb.get();
+            bb.get();
             flags[i] = bb.get();
-            fileOff[i] = bb.getLong();
+            off[i] = bb.getLong();
             NIOUtils.skip(bb, len - 11);
         }
-        byte[] displayOff = new byte[n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (temporalOff[j] == i) {
-                    displayOff[i] = (byte) (j - i);
-                    break;
-                }
-            }
-        }
 
-        return new IndexEntries(displayOff, keyFrameOff, flags, fileOff);
+        return new IndexEntries(tOff, flags, off);
     }
 }

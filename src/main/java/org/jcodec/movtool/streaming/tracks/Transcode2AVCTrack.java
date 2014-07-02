@@ -8,7 +8,6 @@ import org.jcodec.codecs.h264.H264Encoder;
 import org.jcodec.codecs.h264.H264Utils;
 import org.jcodec.codecs.h264.encode.ConstantRateControl;
 import org.jcodec.common.VideoDecoder;
-import org.jcodec.common.logging.Logger;
 import org.jcodec.common.model.ColorSpace;
 import org.jcodec.common.model.Picture;
 import org.jcodec.common.model.Rect;
@@ -123,8 +122,6 @@ public abstract class Transcode2AVCTrack implements VirtualTrack {
         }
 
         public ByteBuffer transcodeFrame(ByteBuffer src, ByteBuffer dst) throws IOException {
-            if (src == null)
-                return null;
             Picture decoded = decoder.decodeFrame(src, pic0.getData());
             if (pic1 == null) {
                 pic1 = Picture.create(decoded.getWidth(), decoded.getHeight(), encoder.getSupportedColorSpaces()[0]);
@@ -138,7 +135,7 @@ public abstract class Transcode2AVCTrack implements VirtualTrack {
                     encoder.encodeFrame(pic1, dst);
                     break;
                 } catch (BufferOverflowException ex) {
-                    Logger.warn("Abandon frame, buffer too small: " + dst.capacity());
+                    System.out.println("Abandon frame!!!");
                     rate -= 10;
                     rc.setRate(rate);
                 }

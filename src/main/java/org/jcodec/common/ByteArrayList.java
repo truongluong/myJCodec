@@ -38,16 +38,6 @@ public class ByteArrayList {
         }
         storage[size++] = val;
     }
-    
-    public void push(byte id) {
-        this.add(id);
-    }
-    
-    public void pop() {
-        if (size == 0)
-            return;
-        size--;
-    }
 
     public void set(int index, byte value) {
         storage[index] = value;
@@ -79,12 +69,5 @@ public class ByteArrayList {
         }
         System.arraycopy(other, 0, storage, size, other.length);
         size += other.length;
-    }
-    
-    public boolean contains(byte needle) {
-        for (int i = 0; i < size; i++)
-            if (storage[i] == needle)
-                return true;
-        return false;
     }
 }

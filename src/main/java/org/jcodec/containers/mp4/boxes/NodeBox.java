@@ -1,13 +1,11 @@
 package org.jcodec.containers.mp4.boxes;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.jcodec.common.NIOUtils;
-import org.jcodec.common.tools.ToJSON;
 
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
@@ -106,33 +104,24 @@ public class NodeBox extends Box {
         removeChildren(fourcc);
         add(box);
     }
-    
-    public void replace(Box box) {
-        removeChildren(box.getFourcc());
-        add(box);
-    }
 
-    protected void dump(StringBuilder sb) {
-        sb.append("{\"tag\":\"" + header.getFourcc() + "\",");
-        List<String> fields = new ArrayList<String>(0);
-        collectModel(this.getClass(), fields);
-        ToJSON.fieldsToJSON(this, sb, fields.toArray(new String[0]));
-        sb.append("\"boxes\": [");
+    public void dump(StringBuilder sb) {
+        super.dump(sb);
+        sb.append(": {\n");
+
         dumpBoxes(sb);
-        sb.append("]");
-        sb.append("}");
-    }
-
-    protected void getModelFields(List<String> model) {
-
+        sb.append("\n}");
     }
 
     protected void dumpBoxes(StringBuilder sb) {
-        for (int i = 0; i < boxes.size(); i++) {
-            boxes.get(i).dump(sb);
-            if (i < boxes.size() - 1)
-                sb.append(",");
+        StringBuilder sb1 = new StringBuilder();
+        Iterator<Box> iterator = boxes.iterator();
+        while (iterator.hasNext()) {
+            iterator.next().dump(sb1);
+            if (iterator.hasNext())
+                sb1.append(",\n");
         }
+        sb.append(sb1.toString().replaceAll("([^\n]*)\n", "  $1\n"));
     }
 
     public void removeChildren(String... fourcc) {

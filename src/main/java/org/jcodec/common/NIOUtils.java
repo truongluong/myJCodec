@@ -129,12 +129,9 @@ public class NIOUtils {
     public static int read(ReadableByteChannel channel, ByteBuffer buffer, int length) throws IOException {
         ByteBuffer fork = buffer.duplicate();
         fork.limit(min(fork.position() + length, fork.limit()));
-        int read;
-        while ((read = channel.read(fork)) != -1 && fork.hasRemaining())
+        while (channel.read(fork) != -1 && fork.hasRemaining())
             ;
-        if (read == -1)
-            return -1;
-
+        int read = fork.position() - buffer.position();
         buffer.position(fork.position());
         return read;
     }
@@ -274,15 +271,6 @@ public class NIOUtils {
         }
     }
 
-    public static void closeQuietly(RandomAccessFile file) {
-        if (file == null)
-            return;
-        try {
-            file.close();
-        } catch (IOException e) {
-        }
-    }
-
     public static byte readByte(ReadableByteChannel channel) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(1);
         channel.read(buf);
@@ -368,48 +356,5 @@ public class NIOUtils {
                 return i;
         }
         return -1;
-    }
-
-    public static interface FileReaderListener {
-        void progress(int percentDone);
-    }
-
-    public static abstract class FileReader {
-        private int oldPd;
-
-        protected abstract void data(ByteBuffer data, long filePos);
-
-        public void readFile(File source, int bufferSize, FileReaderListener listener) throws IOException {
-            ByteBuffer buf = ByteBuffer.allocate(bufferSize);
-            SeekableByteChannel ch = null;
-            try {
-                ch = NIOUtils.readableFileChannel(source);
-                long size = ch.size();
-                for (long pos = ch.position(); ch.read(buf) != -1; pos = ch.position()) {
-                    buf.flip();
-                    data(buf, pos);
-                    buf.flip();
-                    if (listener != null) {
-                        int newPd = (int) (100 * pos / size);
-                        if (newPd != oldPd)
-                            listener.progress(newPd);
-                        oldPd = newPd;
-                    }
-                }
-            } finally {
-                NIOUtils.closeQuietly(ch);
-            }
-        }
-    }
-
-    public static byte getRel(ByteBuffer bb, int rel) {
-        return bb.get(bb.position() + rel);
-    }
-
-    public static ByteBuffer cloneBuffer(ByteBuffer pesBuffer) {
-        ByteBuffer res = ByteBuffer.allocate(pesBuffer.remaining());
-        res.put(pesBuffer.duplicate());
-        res.clear();
-        return res;
     }
 }

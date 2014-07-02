@@ -253,8 +253,4 @@ public class TrakBox extends NodeBox {
 
         return new Size(vse.getWidth(), vse.getHeight());
     }
-    
-    protected void getModelFields(List<String> model) {
-
-    }
 }

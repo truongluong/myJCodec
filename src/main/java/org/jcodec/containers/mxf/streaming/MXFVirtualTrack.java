@@ -135,7 +135,7 @@ public class MXFVirtualTrack implements VirtualTrack {
             MXFCodecMapping codec = track.getCodec();
 
             return MP4Muxer.audioSampleEntry(sampleSize == 3 ? "in24" : "sowt", 0, sampleSize, sed.getChannelCount(),
-                    (int) sed.getAudioSamplingRate().scalar(), codec == MXFCodecMapping.PCM_S16BE ? Endian.BIG_ENDIAN
+                    (int) sed.getAudioSamplingRate().asFloat(), codec == MXFCodecMapping.PCM_S16BE ? Endian.BIG_ENDIAN
                             : Endian.LITTLE_ENDIAN);
         }
         throw new RuntimeException("Can't get sample entry");
@@ -166,9 +166,9 @@ public class MXFVirtualTrack implements VirtualTrack {
                 throws IOException {
             return new MXFDemuxerTrack(ul, track, descriptor) {
                 @Override
-                public MXFPacket readPacket(long off, int len, long pts, int timescale, int duration, int frameNo, boolean kf)
+                public MXFPacket readPacket(long off, int len, long pts, int timescale, int duration, int frameNo)
                         throws IOException {
-                    return new MXFPacket(null, pts, timescale, duration, frameNo, kf, null, off, len);
+                    return new MXFPacket(null, pts, timescale, duration, frameNo, true, null, off, len);
                 }
             };
         }

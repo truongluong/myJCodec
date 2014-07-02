@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jcodec.common.logging.Logger;
-
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
  * under FreeBSD License
@@ -62,7 +60,7 @@ public class RGBAEssenceDescriptor extends GenericPictureEssenceDescriptor {
                 paletteLayout = _bb;
                 break;
             default:
-                Logger.warn(String.format("Unknown tag [ " + ul + "]: %04x",
+                System.out.println(String.format("Unknown tag [ RGBAEssenceDescriptor: " + ul + "]: %04x",
                         entry.getKey()));
                 continue;
             }

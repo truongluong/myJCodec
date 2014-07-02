@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jcodec.common.logging.Logger;
 import org.jcodec.common.model.Rational;
 
 /**
@@ -64,7 +63,8 @@ public class GenericSoundEssenceDescriptor extends FileDescriptor {
                 break;
 
             default:
-                Logger.warn(String.format("Unknown tag [ " + ul + "]: %04x", entry.getKey()));
+//                System.out.println(String.format("Unknown tag [ GenericSoundEssenceDescriptor: " + ul + "]: %04x",
+//                        entry.getKey()));
                 continue;
             }
             it.remove();

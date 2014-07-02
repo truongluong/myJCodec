@@ -27,10 +27,6 @@ public class SyncSamplesBox extends FullBox {
         this.syncSamples = array;
     }
 
-    public SyncSamplesBox(Header header) {
-        super(header);
-    }
-
     public void parse(ByteBuffer input) {
         super.parse(input);
         int len = input.getInt();

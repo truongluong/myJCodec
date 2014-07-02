@@ -1,15 +1,17 @@
 package org.jcodec.common.tools;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jcodec.codecs.wav.WavHeader;
-import org.jcodec.common.AudioUtil;
 import org.jcodec.common.IOUtils;
-import org.jcodec.common.NIOUtils;
 
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
@@ -36,50 +38,42 @@ public class WavMerge {
 
     public static void merge(File result, File... src) throws IOException {
 
-        WritableByteChannel out = null;
-        ReadableByteChannel[] inputs = new ReadableByteChannel[src.length];
-        WavHeader[] headers = new WavHeader[src.length];
-        ByteBuffer[] ins = new ByteBuffer[src.length];
+        List<InputStream> inputs = new ArrayList<InputStream>();
+        BufferedOutputStream out = null;
+        List<WavHeader> headers = new ArrayList<WavHeader>();
         try {
             int sampleSize = -1;
-            for (int i = 0; i < src.length; i++) {
-                inputs[i] = NIOUtils.readableFileChannel(src[i]);
-                WavHeader hdr = WavHeader.read(inputs[i]);
+            long dataSize = -1;
+            for (File wav : src) {
+                BufferedInputStream is = new BufferedInputStream(new FileInputStream(wav));
+                inputs.add(is);
+                WavHeader hdr = WavHeader.read(is);
                 if (sampleSize != -1 && sampleSize != hdr.fmt.bitsPerSample)
                     throw new RuntimeException("Input files have different sample sizes");
+                if (dataSize != -1 && dataSize != hdr.dataSize)
+                    throw new RuntimeException("Input files have different duration");
                 sampleSize = hdr.fmt.bitsPerSample;
-                headers[i] = hdr;
-                ins[i] = ByteBuffer.allocate(hdr.getFormat().framesToBytes(4096));
+                dataSize = hdr.dataSize;
+                headers.add(hdr);
             }
-            ByteBuffer outb = ByteBuffer.allocate(headers[0].getFormat().framesToBytes(4096) * src.length);
+            int ss = sampleSize >> 3;
+            int nSamples = (int) (dataSize / ss);
+            byte[] sample = new byte[ss];
 
-            WavHeader newHeader = WavHeader.multiChannelWav(headers);
-            out = NIOUtils.writableFileChannel(result);
+            WavHeader newHeader = WavHeader.multiChannelWav(headers.toArray(new WavHeader[0]));
+            out = new BufferedOutputStream(new FileOutputStream(result));
             newHeader.write(out);
 
-            for (boolean readOnce = true;;) {
-                readOnce = false;
-                for (int i = 0; i < ins.length; i++) {
-                    if (inputs[i] != null) {
-                        ins[i].clear();
-                        if (inputs[i].read(ins[i]) == -1) {
-                            NIOUtils.closeQuietly(inputs[i]);
-                            inputs[i] = null;
-                        } else
-                            readOnce = true;
-                        ins[i].flip();
-                    }
+            for (int i = 0; i < nSamples; i++) {
+                for (InputStream is : inputs) {
+                    is.read(sample);
+                    out.write(sample);
                 }
-                if (!readOnce)
-                    break;
-                outb.clear();
-                AudioUtil.interleave(headers[0].getFormat(), ins, outb);
-                outb.flip();
-                out.write(outb);
             }
+
         } finally {
             IOUtils.closeQuietly(out);
-            for (ReadableByteChannel inputStream : inputs) {
+            for (InputStream inputStream : inputs) {
                 IOUtils.closeQuietly(inputStream);
             }
         }

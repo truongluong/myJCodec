@@ -91,8 +91,6 @@ public class RealTrack implements VirtualTrack {
             SeekableByteChannel ch = null;
             try {
                 ch = pool.getChannel();
-                if(packet.getFileOff() >= ch.size())
-                    return null;
                 ch.position(packet.getFileOff());
                 ch.read(bb);
                 bb.flip();
@@ -120,7 +118,7 @@ public class RealTrack implements VirtualTrack {
 
         @Override
         public boolean isKeyframe() {
-            return packet.isKeyFrame() || packet.isPsync();
+            return packet.isKeyFrame();
         }
 
         @Override

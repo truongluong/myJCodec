@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jcodec.common.logging.Logger;
-
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
  * under FreeBSD License
@@ -62,7 +60,7 @@ public class MPEG2VideoDescriptor extends CDCIEssenceDescriptor {
                 maxGOP = _bb.getShort();
                 break;
             case 0x8007:
-                bPictureCount = (short) (_bb.get() & 0xff);
+                bPictureCount = _bb.getShort();
                 break;
             case 0x8008:
                 bitRate = _bb.getInt();
@@ -71,7 +69,9 @@ public class MPEG2VideoDescriptor extends CDCIEssenceDescriptor {
                 profileAndLevel = _bb.get();
                 break;
             default:
-                Logger.warn(String.format("Unknown tag [ " + ul + "]: %04x + (" + _bb.remaining() + ")", entry.getKey()));
+                System.out.println(String.format(
+                        "Unknown tag [ MPEG2VideoDescriptor: " + ul + "]: %04x + (" + _bb.remaining() + ")",
+                        entry.getKey()));
                 continue;
             }
             it.remove();

@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jcodec.common.logging.Logger;
-
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
  * under FreeBSD License
@@ -36,7 +34,7 @@ public class GenericDataEssenceDescriptor extends FileDescriptor {
                 dataEssenceCoding = UL.read(_bb);
                 break;
             default:
-                Logger.warn(String.format("Unknown tag [ FileDescriptor: " + ul + "]: %04x", entry.getKey()));
+                System.out.println(String.format("Unknown tag [ FileDescriptor: " + ul + "]: %04x", entry.getKey()));
                 continue;
             }
             it.remove();

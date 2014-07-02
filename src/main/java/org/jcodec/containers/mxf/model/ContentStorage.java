@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jcodec.common.logging.Logger;
-
 /**
  * This class is part of JCodec ( www.jcodec.org ) This software is distributed
  * under FreeBSD License
@@ -37,7 +35,7 @@ public class ContentStorage extends MXFInterchangeObject {
                 essenceContainerData = readULBatch(_bb);
                 break;
             default:
-                Logger.warn(String.format("Unknown tag [ ContentStorage: " + ul + "]: %04x", entry.getKey()));
+                System.out.println(String.format("Unknown tag [ ContentStorage: " + ul + "]: %04x", entry.getKey()));
                 continue;
             }
             it.remove();
